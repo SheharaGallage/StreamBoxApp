@@ -7,9 +7,8 @@ export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 export const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 export const TMDB_IMAGE_BASE_URL_ORIGINAL = 'https://image.tmdb.org/t/p/original';
 
-// You need to get your API key from https://www.themoviedb.org/
-// For now, using a placeholder - replace with your actual API key
-export const TMDB_API_KEY = 'YOUR_TMDB_API_KEY_HERE';
+// TMDB API Key
+export const TMDB_API_KEY = 'b5df2d4387ec2528a7ac0aa4f5531d52';
 
 // Dummy JSON API (for authentication)
 export const DUMMY_JSON_BASE_URL = 'https://dummyjson.com';

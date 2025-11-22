@@ -1,8 +1,26 @@
-# Welcome to your Expo app 👋
+# StreamBox App 🎬
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile application for browsing trending movies, songs, and podcasts. Built with Expo, React Navigation, Redux Toolkit, and The Movie Database (TMDB) API.
 
-## Get started
+## Features
+
+- 🔐 User Authentication (Login/Register)
+- 🎥 Browse Trending and Popular Movies
+- ❤️ Add Movies to Favorites
+- 🌓 Dark Mode Support
+- 📱 Responsive Design
+- 💾 Data Persistence (AsyncStorage)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+- Expo CLI
+- Android Studio (for Android) or Xcode (for iOS)
+
+### Installation
 
 1. Install dependencies
 
@@ -10,41 +28,95 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Get your TMDB API Key
 
-   ```bash
-   npx expo start
+   - Go to [https://www.themoviedb.org/](https://www.themoviedb.org/)
+   - Sign up for a free account
+   - Navigate to Settings → API
+   - Request an API key (it's free!)
+   - Copy your API key
+
+3. Configure API Key
+
+   - Open `constants/api.ts`
+   - Replace `YOUR_TMDB_API_KEY_HERE` with your actual API key:
+
+   ```typescript
+   export const TMDB_API_KEY = "your_actual_api_key_here";
    ```
 
-In the output, you'll find options to open the app in a
+4. Start the app
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   ```bash
+   npm start
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+   Or use platform-specific commands:
 
-## Get a fresh project
+   ```bash
+   npm run android  # For Android
+   npm run ios      # For iOS
+   npm run web      # For Web
+   ```
 
-When you're ready, run:
+## Test Credentials
 
-```bash
-npm run reset-project
+For testing the authentication feature, you can use:
+
+- **Username:** `emilys`
+- **Password:** `emilyspass`
+
+Or register a new account using the registration screen.
+
+## Project Structure
+
+```
+StreamBoxApp/
+├── app/                    # App screens and navigation
+│   ├── (auth)/            # Authentication screens
+│   ├── (tabs)/            # Main app tabs
+│   └── movie/             # Movie details screen
+├── components/            # Reusable components
+│   ├── ui/               # UI components (Button, TextInput)
+│   └── MovieCard.tsx     # Movie card component
+├── store/                # Redux store configuration
+│   └── slices/           # Redux slices (auth, movie, theme)
+├── services/             # API services
+├── utils/                # Utility functions
+└── constants/            # App constants (theme, API config)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Tech Stack
 
-## Learn more
+- **React Native** - Mobile framework
+- **Expo** - Development platform
+- **TypeScript** - Type safety
+- **Redux Toolkit** - State management
+- **React Navigation** - Navigation
+- **React Hook Form** - Form handling
+- **Yup** - Form validation
+- **Axios** - HTTP client
+- **AsyncStorage** - Local storage
+- **TMDB API** - Movie data
+- **DummyJSON API** - Authentication
 
-To learn more about developing your project with Expo, look at the following resources:
+## Available Scripts
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- `npm start` - Start Expo development server
+- `npm run android` - Run on Android emulator/device
+- `npm run ios` - Run on iOS simulator/device
+- `npm run web` - Run on web browser
+- `npm run lint` - Run ESLint
 
-## Join the community
+## Assignment Progress
 
-Join our community of developers creating universal apps.
+✅ **Day 1:** Project setup, Redux store, Auth slice, Navigation structure  
+✅ **Day 2:** Authentication screens with validation  
+✅ **Day 3:** API integration and movie list  
+🔲 **Day 4:** Movie details screen and favorites functionality  
+🔲 **Day 5:** Dark mode and final polish  
+🔲 **Day 6:** Final testing and documentation
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## License
+
+This project is created for educational purposes as part of IN3210 Mobile Applications Development course.

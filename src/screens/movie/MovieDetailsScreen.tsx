@@ -1,3 +1,4 @@
+import { useTheme } from '@/src/hooks/useTheme';
 import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { addFavorite, removeFavorite } from '@/src/redux/slices/favoritesSlice';
 import { fetchMovieDetails } from '@/src/redux/slices/moviesSlice';
@@ -5,7 +6,7 @@ import { TMDBService } from '@/src/services/api/tmdb';
 import { formatRuntime } from '@/src/utils/helpers';
 import { Feather } from '@expo/vector-icons';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
     ActivityIndicator,
     Dimensions,
@@ -22,10 +23,12 @@ const { width, height } = Dimensions.get('window');
 export default function MovieDetailsScreen() {
   const { id } = useLocalSearchParams();
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { selectedMovie, isLoading, error } = useAppSelector((state) => state.movies);
   const { favoriteIds } = useAppSelector((state) => state.favorites);
 
   const isFavorite = selectedMovie ? favoriteIds.includes(selectedMovie.id) : false;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   useEffect(() => {
     if (id) {
@@ -47,7 +50,7 @@ export default function MovieDetailsScreen() {
     return (
       <View style={styles.centered}>
         <Stack.Screen options={{ headerShown: false }} />
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
@@ -193,16 +196,16 @@ export default function MovieDetailsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.background,
   },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: theme.background,
   },
   backdropContainer: {
     width: width,
@@ -219,7 +222,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: theme.isDarkMode ? 'rgba(18, 18, 18, 0.9)' : 'rgba(255, 255, 255, 0.9)',
   },
   headerBackButton: {
     position: 'absolute',
@@ -250,7 +253,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 180,
     borderRadius: 12,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: theme.cardBackground,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -265,13 +268,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 4,
   },
   tagline: {
     fontSize: 14,
     fontStyle: 'italic',
-    color: '#666',
+    color: theme.textSecondary,
     marginBottom: 12,
   },
   metaRow: {
@@ -286,7 +289,7 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 14,
-    color: '#666',
+    color: theme.textSecondary,
     fontWeight: '500',
   },
   genresContainer: {
@@ -295,14 +298,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   genreBadge: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: theme.isDarkMode ? 'rgba(33, 150, 243, 0.2)' : '#E3F2FD',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   genreText: {
     fontSize: 12,
-    color: '#2196F3',
+    color: theme.primary,
     fontWeight: '600',
   },
   section: {
@@ -311,7 +314,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 12,
   },
   statusBadge: {
@@ -329,31 +332,31 @@ const styles = StyleSheet.create({
   overview: {
     fontSize: 15,
     lineHeight: 24,
-    color: '#333',
+    color: theme.text,
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: theme.border,
   },
   detailLabel: {
     fontSize: 14,
-    color: '#666',
+    color: theme.textSecondary,
   },
   detailValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: theme.text,
   },
   errorText: {
     fontSize: 16,
-    color: '#ff4444',
+    color: theme.error,
     marginBottom: 16,
   },
   backButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: theme.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,

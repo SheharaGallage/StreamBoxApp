@@ -1,21 +1,21 @@
+import { TMDBService } from '@/src/services/api/tmdb';
+import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
+import { addFavorite, removeFavorite } from '@/src/store/slices/favoritesSlice';
+import { fetchMovieDetails } from '@/src/store/slices/moviesSlice';
+import { formatRuntime } from '@/src/utils/helpers';
+import { Feather } from '@expo/vector-icons';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect } from 'react';
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-  TouchableOpacity,
-  Dimensions,
+    ActivityIndicator,
+    Dimensions,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { useLocalSearchParams, Stack, router } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
-import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
-import { fetchMovieDetails } from '@/src/store/slices/moviesSlice';
-import { addFavorite, removeFavorite } from '@/src/store/slices/favoritesSlice';
-import { TMDBService } from '@/src/services/api/tmdb';
-import { formatRuntime } from '@/src/utils/helpers';
 
 const { width, height } = Dimensions.get('window');
 

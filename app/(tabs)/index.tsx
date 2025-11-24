@@ -7,6 +7,7 @@ import {
   fetchUpcomingMovies,
 } from '@/src/store/slices/moviesSlice';
 import { Movie } from '@/src/types';
+import { router } from 'expo-router';
 import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
@@ -16,7 +17,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const dispatch = useAppDispatch();

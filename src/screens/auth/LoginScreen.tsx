@@ -1,8 +1,9 @@
+import { useTheme } from '@/src/hooks/useTheme';
 import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { clearError, loginUser } from '@/src/redux/slices/authSlice';
 import { validateLoginForm } from '@/src/utils/validation';
 import { Link, router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -18,11 +19,14 @@ import {
 
 export default function LoginScreen() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { isLoading, error } = useAppSelector((state) => state.auth);
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const handleLogin = async () => {
     // Clear previous errors
@@ -67,7 +71,7 @@ export default function LoginScreen() {
               <TextInput
                 style={[styles.input, errors.username && styles.inputError]}
                 placeholder="Enter your username"
-                placeholderTextColor="#999"
+                placeholderTextColor={theme.textSecondary}
                 value={username}
                 onChangeText={setUsername}
                 autoCapitalize="none"
@@ -82,7 +86,7 @@ export default function LoginScreen() {
               <TextInput
                 style={[styles.input, errors.password && styles.inputError]}
                 placeholder="Enter your password"
-                placeholderTextColor="#999"
+                placeholderTextColor={theme.textSecondary}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -122,10 +126,10 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -142,12 +146,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: theme.textSecondary,
     fontWeight: '400',
   },
   form: {
@@ -159,37 +163,37 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: theme.text,
     marginBottom: 8,
   },
   input: {
     height: 52,
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderRadius: 12,
     paddingHorizontal: 16,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-    color: '#1a1a1a',
+    borderColor: theme.border,
+    color: theme.text,
   },
   inputError: {
-    borderColor: '#ff4444',
+    borderColor: theme.error,
   },
   errorText: {
     fontSize: 13,
-    color: '#ff4444',
+    color: theme.error,
     marginTop: 6,
     fontWeight: '500',
   },
   loginButton: {
     height: 52,
-    backgroundColor: '#2196F3',
+    backgroundColor: theme.primary,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
     elevation: 2,
-    shadowColor: '#2196F3',
+    shadowColor: theme.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -204,7 +208,7 @@ const styles = StyleSheet.create({
   },
   serverError: {
     fontSize: 14,
-    color: '#ff4444',
+    color: theme.error,
     textAlign: 'center',
     marginTop: 16,
     fontWeight: '500',
@@ -216,11 +220,11 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
-    color: '#666',
+    color: theme.textSecondary,
   },
   linkText: {
     fontSize: 14,
-    color: '#2196F3',
+    color: theme.primary,
     fontWeight: '600',
   },
 });

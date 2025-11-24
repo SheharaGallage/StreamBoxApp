@@ -1,8 +1,8 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, View, useColorScheme } from 'react-native';
 import 'react-native-reanimated';
 import { Provider } from 'react-redux';
 
@@ -16,9 +16,22 @@ function RootNavigator() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const segments = useSegments();
+  const systemColorScheme = useColorScheme();
   const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
   const { isDarkMode } = useAppSelector((state) => state.theme);
   const [isNavigationReady, setIsNavigationReady] = useState(false);
+
+  // Use system theme as fallback until theme preference is loaded
+  const effectiveDarkMode = isDarkMode ?? (systemColorScheme === 'dark');
+
+  const loadingStyles = useMemo(() => ({
+    flex: 1,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    backgroundColor: effectiveDarkMode ? '#121212' : '#fff',
+  }), [effectiveDarkMode]);
+
+  const loaderColor = '#2196F3';
 
   useEffect(() => {
     // Load stored authentication and theme on app start
@@ -52,20 +65,20 @@ function RootNavigator() {
 
   if (isLoading || !isNavigationReady) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
-        <ActivityIndicator size="large" color="#2196F3" />
+      <View style={loadingStyles}>
+        <ActivityIndicator size="large" color={loaderColor} />
       </View>
     );
   }
 
   return (
-    <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={effectiveDarkMode ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+      <StatusBar style={effectiveDarkMode ? 'light' : 'dark'} />
     </ThemeProvider>
   );
 }

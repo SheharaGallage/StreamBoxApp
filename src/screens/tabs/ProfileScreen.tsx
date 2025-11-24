@@ -5,9 +5,9 @@ import { logoutUser } from '@/src/redux/slices/authSlice';
 import { toggleTheme } from '@/src/redux/slices/themeSlice';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-    Alert,
+    Modal,
     ScrollView,
     StyleSheet,
     Switch,
@@ -23,23 +23,24 @@ export default function ProfileScreen() {
   const { favoriteMovies } = useAppSelector((state) => state.favorites);
   const { isDarkMode } = useAppSelector((state) => state.theme);
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleThemeToggle = async (value: boolean) => {
     await dispatch(toggleTheme(value));
   };
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: async () => {
-          await dispatch(logoutUser());
-          router.replace('/(auth)/login');
-        },
-      },
-    ]);
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
+    setShowLogoutModal(false);
+    await dispatch(logoutUser());
+    router.replace('/(auth)/login');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   const getInitials = () => {
@@ -156,6 +157,30 @@ export default function ProfileScreen() {
 
         <View style={styles.bottomPadding} />
       </ScrollView>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        visible={showLogoutModal}
+        transparent
+        animationType="fade"
+        onRequestClose={cancelLogout}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Logout</Text>
+            <Text style={styles.modalMessage}>Are you sure you want to logout?</Text>
+            
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.modalCancelButton} onPress={cancelLogout}>
+                <Text style={styles.modalCancelText}>CANCEL</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalLogoutButton} onPress={confirmLogout}>
+                <Text style={styles.modalLogoutText}>LOGOUT</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ThemedView>
   );
 }
@@ -355,5 +380,62 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   bottomPadding: {
     height: 32,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: theme.cardBackground,
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 340,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.text,
+    marginBottom: 12,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: theme.textSecondary,
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  modalCancelButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  modalCancelText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.primary,
+  },
+  modalLogoutButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  modalLogoutText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.primary,
   },
 });

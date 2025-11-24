@@ -1,8 +1,9 @@
+import { useTheme } from '@/src/hooks/useTheme';
 import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
 import { clearError, registerUser } from '@/src/redux/slices/authSlice';
 import { validateRegisterForm } from '@/src/utils/validation';
 import { Link, router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -18,6 +19,7 @@ import {
 
 export default function RegisterScreen() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { isLoading } = useAppSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
@@ -30,6 +32,7 @@ export default function RegisterScreen() {
   });
 
   const [errors, setErrors] = useState<any>({});
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const updateField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -217,10 +220,10 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -236,13 +239,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
+    fontWeight: '800',
+    color: theme.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: theme.textSecondary,
   },
   form: {
     width: '100%',
@@ -253,27 +256,28 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: theme.text,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: theme.cardBackground,
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: theme.border,
+    color: theme.text,
   },
   inputError: {
-    borderColor: '#ff4444',
+    borderColor: theme.error,
   },
   errorText: {
-    color: '#ff4444',
+    color: theme.error,
     fontSize: 12,
     marginTop: 4,
   },
   button: {
-    backgroundColor: '#2196F3',
+    backgroundColor: theme.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -296,11 +300,11 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
-    color: '#666',
+    color: theme.textSecondary,
   },
   linkText: {
     fontSize: 14,
-    color: '#2196F3',
+    color: theme.primary,
     fontWeight: '600',
   },
 });

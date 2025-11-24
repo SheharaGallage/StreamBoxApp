@@ -12,14 +12,15 @@ interface MovieCardProps {
 }
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 48) / 2; // 2 columns with padding
+const CARD_WIDTH = 150;
 
 export default function MovieCard({ movie, onPress }: MovieCardProps) {
   const dispatch = useAppDispatch();
   const { favoriteIds } = useAppSelector((state) => state.favorites);
   const isFavorite = favoriteIds.includes(movie.id);
 
-  const handleFavoriteToggle = () => {
+  const handleFavoriteToggle = (e: any) => {
+    e.stopPropagation();
     if (isFavorite) {
       dispatch(removeFavorite(movie.id));
     } else {
@@ -31,9 +32,12 @@ export default function MovieCard({ movie, onPress }: MovieCardProps) {
   const rating = movie.vote_average.toFixed(1);
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: posterUrl }} style={styles.poster} resizeMode="cover" />
+        
+        {/* Gradient Overlay */}
+        <View style={styles.gradientOverlay} />
         
         {/* Favorite Button */}
         <TouchableOpacity
@@ -42,7 +46,7 @@ export default function MovieCard({ movie, onPress }: MovieCardProps) {
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
           <Feather
             name="heart"
-            size={20}
+            size={18}
             color={isFavorite ? '#ff4444' : '#fff'}
             fill={isFavorite ? '#ff4444' : 'transparent'}
           />
@@ -50,7 +54,7 @@ export default function MovieCard({ movie, onPress }: MovieCardProps) {
 
         {/* Rating Badge */}
         <View style={styles.ratingBadge}>
-          <Feather name="star" size={12} color="#FFD700" />
+          <Feather name="star" size={10} color="#FFD700" fill="#FFD700" />
           <Text style={styles.ratingText}>{rating}</Text>
         </View>
       </View>
@@ -70,34 +74,49 @@ export default function MovieCard({ movie, onPress }: MovieCardProps) {
 const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   imageContainer: {
-    width: '100%',
+    width: CARD_WIDTH,
     height: CARD_WIDTH * 1.5,
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f0f0f0',
     position: 'relative',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
   poster: {
     width: '100%',
     height: '100%',
   },
+  gradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+    backgroundColor: 'transparent',
+  },
   favoriteButton: {
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 20,
-    padding: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 18,
+    padding: 8,
+    zIndex: 10,
+    elevation: 5,
   },
   ratingBadge: {
     position: 'absolute',
-    top: 8,
+    bottom: 8,
     left: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
     flexDirection: 'row',
@@ -106,21 +125,22 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
   },
   info: {
     marginTop: 8,
     gap: 4,
   },
   title: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#1a1a1a',
-    lineHeight: 18,
+    lineHeight: 17,
   },
   releaseDate: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 11,
+    color: '#888',
+    fontWeight: '500',
   },
 });

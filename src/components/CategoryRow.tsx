@@ -44,9 +44,9 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 16,
+    paddingVertical: 4,
   },
   cardWrapper: {
-    marginRight: 12,
-    width: 140,
+    marginRight: 16,
   },
 });

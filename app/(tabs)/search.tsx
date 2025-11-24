@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
+    Animated,
     FlatList,
     Keyboard,
     StyleSheet,
@@ -22,10 +23,11 @@ export default function SearchScreen() {
   const { searchResults, isLoading } = useAppSelector((state) => state.movies);
   const [searchQuery, setSearchQuery] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+  const [focusAnim] = useState(new Animated.Value(0));
 
   const handleSearch = useCallback(async () => {
     if (searchQuery.trim().length < 2) return;
-    
+
     Keyboard.dismiss();
     setHasSearched(true);
     await dispatch(searchMovies(searchQuery.trim()));
@@ -41,27 +43,81 @@ export default function SearchScreen() {
     router.push(`/movie/${movie.id}` as any);
   };
 
+  const handleFocus = () => {
+    Animated.spring(focusAnim, {
+      toValue: 1,
+      useNativeDriver: false,
+      tension: 40,
+      friction: 7,
+    }).start();
+  };
+
+  const handleBlur = () => {
+    Animated.spring(focusAnim, {
+      toValue: 0,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const borderColor = focusAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#e0e0e0', '#2196F3'],
+  });
+
+  const renderPopularSearches = () => {
+    const popularSearches = ['Avengers', 'Spider-Man', 'Batman', 'Star Wars', 'Inception'];
+
+    return (
+      <View style={styles.popularContainer}>
+        <Text style={styles.popularTitle}>Popular Searches</Text>
+        <View style={styles.popularChips}>
+          {popularSearches.map((term) => (
+            <TouchableOpacity
+              key={term}
+              style={styles.chip}
+              onPress={() => {
+                setSearchQuery(term);
+                setHasSearched(true);
+                dispatch(searchMovies(term));
+              }}>
+              <Feather name="trending-up" size={14} color="#2196F3" />
+              <Text style={styles.chipText}>{term}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
   const renderEmptyState = () => {
     if (!hasSearched) {
       return (
-        <View style={styles.emptyState}>
-          <Feather name="search" size={64} color="#ccc" />
-          <Text style={styles.emptyTitle}>Search for Movies</Text>
+        <View style={styles.emptyStateContainer}>
+          <View style={styles.iconCircle}>
+            <Feather name="search" size={48} color="#2196F3" />
+          </View>
+          <Text style={styles.emptyTitle}>Discover Movies</Text>
           <Text style={styles.emptySubtitle}>
-            Find your favorite movies and TV shows
+            Search for your favorite movies and explore thousands of titles
           </Text>
+          {renderPopularSearches()}
         </View>
       );
     }
 
     if (searchResults.length === 0) {
       return (
-        <View style={styles.emptyState}>
-          <Feather name="film" size={64} color="#ccc" />
+        <View style={styles.emptyStateContainer}>
+          <View style={styles.iconCircle}>
+            <Feather name="film" size={48} color="#ff9800" />
+          </View>
           <Text style={styles.emptyTitle}>No Results Found</Text>
           <Text style={styles.emptySubtitle}>
-            Try searching with different keywords
+            We couldn't find any movies matching "{searchQuery}"
           </Text>
+          <TouchableOpacity style={styles.retryButton} onPress={handleClear}>
+            <Text style={styles.retryButtonText}>Try Another Search</Text>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -74,41 +130,50 @@ export default function SearchScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Search</Text>
+        <Text style={styles.headerSubtitle}>Find your next favorite movie</Text>
       </View>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <View style={styles.searchInputContainer}>
-          <Feather name="search" size={20} color="#999" style={styles.searchIcon} />
+        <Animated.View style={[styles.searchInputContainer, { borderColor }]}>
+          <Feather name="search" size={22} color="#2196F3" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search movies..."
+            placeholder="Search for movies..."
             placeholderTextColor="#999"
             value={searchQuery}
             onChangeText={setSearchQuery}
             onSubmitEditing={handleSearch}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             returnKeyType="search"
             autoCapitalize="none"
             autoCorrect={false}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
-              <Feather name="x" size={20} color="#999" />
+              <View style={styles.clearButtonCircle}>
+                <Feather name="x" size={16} color="#666" />
+              </View>
             </TouchableOpacity>
           )}
-        </View>
-
-        {searchQuery.trim().length >= 2 && (
-          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <Text style={styles.searchButtonText}>Search</Text>
-          </TouchableOpacity>
-        )}
+        </Animated.View>
       </View>
+
+      {/* Results Count */}
+      {hasSearched && !isLoading && searchResults.length > 0 && (
+        <View style={styles.resultsHeader}>
+          <Text style={styles.resultsCount}>
+            {searchResults.length} {searchResults.length === 1 ? 'result' : 'results'} found
+          </Text>
+        </View>
+      )}
 
       {/* Loading Indicator */}
       {isLoading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#2196F3" />
+          <Text style={styles.loadingText}>Searching movies...</Text>
         </View>
       )}
 
@@ -139,69 +204,90 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f8f9fa',
   },
   header: {
     paddingTop: 60,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 32,
+    fontWeight: '800',
     color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 15,
+    color: '#666',
+    fontWeight: '400',
   },
   searchContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 16,
-    gap: 12,
     backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   searchInputContainer: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    borderWidth: 2,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: 12,
   },
   searchInput: {
     flex: 1,
-    height: 48,
+    height: 52,
     fontSize: 16,
     color: '#1a1a1a',
+    fontWeight: '500',
   },
   clearButton: {
     padding: 4,
   },
-  searchButton: {
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 24,
+  clearButtonCircle: {
+    width: 24,
+    height: 24,
     borderRadius: 12,
+    backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  searchButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  resultsHeader: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+  },
+  resultsCount: {
+    fontSize: 14,
     fontWeight: '600',
+    color: '#2196F3',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
   },
   listContent: {
     padding: 16,
-    paddingTop: 8,
+    paddingTop: 12,
   },
   movieCardWrapper: {
     flex: 1,
@@ -213,23 +299,77 @@ const styles = StyleSheet.create({
   rightColumn: {
     paddingLeft: 8,
   },
-  emptyState: {
+  emptyStateContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 100,
-    gap: 16,
+    paddingTop: 60,
+    paddingHorizontal: 32,
+  },
+  iconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#f0f7ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 16,
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 12,
+    textAlign: 'center',
   },
   emptySubtitle: {
-    fontSize: 14,
-    color: '#999',
+    fontSize: 15,
+    color: '#666',
     textAlign: 'center',
-    paddingHorizontal: 40,
+    lineHeight: 22,
+    marginBottom: 32,
+  },
+  popularContainer: {
+    width: '100%',
+    marginTop: 16,
+  },
+  popularTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginBottom: 16,
+  },
+  popularChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#E3F2FD',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#BBDEFB',
+  },
+  chipText: {
+    fontSize: 14,
+    color: '#1976D2',
+    fontWeight: '600',
+  },
+  retryButton: {
+    backgroundColor: '#2196F3',
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

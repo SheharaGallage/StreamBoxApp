@@ -1,7 +1,7 @@
-import { TMDBService } from '@/src/services/api/tmdb';
 import { useTheme } from '@/src/hooks/useTheme';
-import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
-import { addFavorite, removeFavorite } from '@/src/store/slices/favoritesSlice';
+import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
+import { addFavorite, removeFavorite } from '@/src/redux/slices/favoritesSlice';
+import { TMDBService } from '@/src/services/api/tmdb';
 import { Movie } from '@/src/types';
 import { Feather } from '@expo/vector-icons';
 import React, { useMemo } from 'react';

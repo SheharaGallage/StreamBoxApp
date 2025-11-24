@@ -6,11 +6,11 @@ import { ActivityIndicator, View } from 'react-native';
 import 'react-native-reanimated';
 import { Provider } from 'react-redux';
 
-import { store } from '@/src/store';
-import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
-import { loadStoredAuth } from '@/src/store/slices/authSlice';
-import { loadFavorites } from '@/src/store/slices/favoritesSlice';
-import { loadThemePreference } from '@/src/store/slices/themeSlice';
+import { store } from '@/src/redux';
+import { useAppDispatch, useAppSelector } from '@/src/redux/hooks';
+import { loadStoredAuth } from '@/src/redux/slices/authSlice';
+import { loadFavorites } from '@/src/redux/slices/favoritesSlice';
+import { loadThemePreference } from '@/src/redux/slices/themeSlice';
 
 function RootNavigator() {
   const dispatch = useAppDispatch();

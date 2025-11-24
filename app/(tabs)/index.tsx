@@ -16,6 +16,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { router } from 'expo-router';
 
 export default function HomeScreen() {
   const dispatch = useAppDispatch();
@@ -43,8 +44,8 @@ export default function HomeScreen() {
   };
 
   const handleMoviePress = (movie: Movie) => {
-    // Navigate to movie details (we'll create this later)
-    console.log('Movie pressed:', movie.title);
+    // Navigate to movie details
+    router.push(`/movie/${movie.id}` as any);
   };
 
   if (isLoading && !refreshing && trending.length === 0) {

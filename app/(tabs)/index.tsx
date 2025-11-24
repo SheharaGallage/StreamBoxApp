@@ -1,29 +1,32 @@
 import { ThemedView } from '@/components/themed-view';
 import CategoryRow from '@/src/components/CategoryRow';
+import { useTheme } from '@/src/hooks/useTheme';
 import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
 import {
-  fetchPopularMovies,
-  fetchTrendingMovies,
-  fetchUpcomingMovies,
+    fetchPopularMovies,
+    fetchTrendingMovies,
+    fetchUpcomingMovies,
 } from '@/src/store/slices/moviesSlice';
 import { Movie } from '@/src/types';
 import { router } from 'expo-router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from 'react-native';
 
 export default function HomeScreen() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { trending, popular, upcoming, isLoading, error } = useAppSelector(
     (state) => state.movies
   );
   const [refreshing, setRefreshing] = React.useState(false);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const loadMovies = async () => {
     await Promise.all([
@@ -85,26 +88,27 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.background,
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: 16,
     paddingBottom: 16,
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: theme.border,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: theme.text,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: theme.textSecondary,
     marginTop: 4,
   },
   scrollView: {
@@ -118,18 +122,18 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#666',
+    color: theme.textSecondary,
     marginTop: 12,
   },
   errorText: {
     fontSize: 16,
-    color: '#ff4444',
+    color: theme.error,
     textAlign: 'center',
     paddingHorizontal: 40,
   },
   errorSubtext: {
     fontSize: 14,
-    color: '#999',
+    color: theme.textSecondary,
     marginTop: 8,
   },
 });

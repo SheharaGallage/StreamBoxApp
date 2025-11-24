@@ -1,11 +1,12 @@
 import { ThemedView } from '@/components/themed-view';
 import MovieCard from '@/src/components/MovieCard';
+import { useTheme } from '@/src/hooks/useTheme';
 import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
 import { fetchFavoriteMovies } from '@/src/store/slices/favoritesSlice';
 import { Movie } from '@/src/types';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -18,8 +19,10 @@ import {
 
 export default function FavoritesScreen() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { favoriteMovies, isLoading } = useAppSelector((state) => state.favorites);
   const [refreshing, setRefreshing] = useState(false);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   useEffect(() => {
     dispatch(fetchFavoriteMovies());
@@ -116,10 +119,10 @@ export default function FavoritesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.background,
   },
   header: {
     flexDirection: 'row',
@@ -128,26 +131,26 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: theme.border,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 15,
-    color: '#666',
+    color: theme.textSecondary,
     fontWeight: '400',
   },
   heartBadge: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#fce4ec',
+    backgroundColor: theme.isDarkMode ? '#3a2a3f' : '#fce4ec',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -159,7 +162,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#666',
+    color: theme.textSecondary,
     fontWeight: '500',
   },
   listContent: {
@@ -190,7 +193,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#fce4ec',
+    backgroundColor: theme.isDarkMode ? '#3a2a3f' : '#fce4ec',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 28,
@@ -198,13 +201,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 26,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 12,
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 15,
-    color: '#666',
+    color: theme.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 32,
@@ -213,12 +216,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: '#e91e63',
+    backgroundColor: theme.pink,
     paddingHorizontal: 28,
     paddingVertical: 14,
     borderRadius: 12,
     elevation: 3,
-    shadowColor: '#e91e63',
+    shadowColor: theme.pink,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

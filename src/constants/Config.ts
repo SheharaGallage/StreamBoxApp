@@ -21,6 +21,7 @@ export const STORAGE_KEYS = {
   AUTH_TOKEN: '@streambox_auth_token',
   USER_DATA: '@streambox_user_data',
   FAVORITES: '@streambox_favorites',
+  THEME: '@streambox_theme',
 };
 
 export const APP_CONFIG = {

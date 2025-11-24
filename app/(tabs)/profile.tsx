@@ -1,9 +1,11 @@
 import { ThemedView } from '@/components/themed-view';
+import { useTheme } from '@/src/hooks/useTheme';
 import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
 import { logoutUser } from '@/src/store/slices/authSlice';
+import { toggleTheme } from '@/src/store/slices/themeSlice';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import {
     Alert,
     ScrollView,
@@ -16,10 +18,15 @@ import {
 
 export default function ProfileScreen() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
   const { favoriteMovies } = useAppSelector((state) => state.favorites);
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
+  const { isDarkMode } = useAppSelector((state) => state.theme);
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
+  const handleThemeToggle = async (value: boolean) => {
+    await dispatch(toggleTheme(value));
+  };
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -103,29 +110,9 @@ export default function ProfileScreen() {
                 </View>
               </View>
               <Switch
-                value={darkMode}
-                onValueChange={setDarkMode}
+                value={isDarkMode}
+                onValueChange={handleThemeToggle}
                 trackColor={{ false: '#d0d0d0', true: '#9c27b0' }}
-                thumbColor="#fff"
-              />
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingLeft}>
-                <View style={[styles.settingIcon, { backgroundColor: '#e8f5e9' }]}>
-                  <Feather name="bell" size={20} color="#4caf50" />
-                </View>
-                <View>
-                  <Text style={styles.settingTitle}>Notifications</Text>
-                  <Text style={styles.settingSubtitle}>Receive updates</Text>
-                </View>
-              </View>
-              <Switch
-                value={notifications}
-                onValueChange={setNotifications}
-                trackColor={{ false: '#d0d0d0', true: '#4caf50' }}
                 thumbColor="#fff"
               />
             </View>
@@ -173,10 +160,10 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.background,
   },
   scrollView: {
     flex: 1,
@@ -185,30 +172,30 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#1a1a1a',
+    color: theme.text,
   },
   avatarSection: {
     alignItems: 'center',
     paddingVertical: 32,
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: theme.border,
   },
   avatarCircle: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#2196F3',
+    backgroundColor: theme.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
     elevation: 4,
-    shadowColor: '#2196F3',
+    shadowColor: theme.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
@@ -221,17 +208,17 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 4,
   },
   userEmail: {
     fontSize: 15,
-    color: '#666',
+    color: theme.textSecondary,
     marginBottom: 2,
   },
   userUsername: {
     fontSize: 14,
-    color: '#2196F3',
+    color: theme.primary,
     fontWeight: '600',
   },
   statsContainer: {
@@ -242,7 +229,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
@@ -256,7 +243,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#fce4ec',
+    backgroundColor: theme.isDarkMode ? '#3a2a3f' : '#fce4ec',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -264,12 +251,12 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 13,
-    color: '#666',
+    color: theme.textSecondary,
     fontWeight: '500',
   },
   section: {
@@ -279,11 +266,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 12,
   },
   settingCard: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderRadius: 16,
     padding: 16,
     elevation: 2,
@@ -314,22 +301,22 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: theme.text,
   },
   settingSubtitle: {
     fontSize: 13,
-    color: '#666',
+    color: theme.textSecondary,
     marginTop: 2,
   },
   divider: {
     height: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: theme.border,
     marginVertical: 12,
   },
   actionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
@@ -343,7 +330,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: theme.text,
     marginLeft: 12,
   },
   logoutButton: {
@@ -351,12 +338,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-    backgroundColor: '#f44336',
+    backgroundColor: theme.error,
     marginHorizontal: 20,
     paddingVertical: 16,
     borderRadius: 16,
     elevation: 3,
-    shadowColor: '#f44336',
+    shadowColor: theme.error,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 6,

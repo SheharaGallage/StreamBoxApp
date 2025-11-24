@@ -1,21 +1,21 @@
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/src/hooks/useTheme';
 import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const theme = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#2196F3',
-        tabBarInactiveTintColor: colorScheme === 'dark' ? '#999' : '#666',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textSecondary,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colorScheme === 'dark' ? '#1a1a1a' : '#fff',
-          borderTopColor: colorScheme === 'dark' ? '#333' : '#e0e0e0',
+          backgroundColor: theme.cardBackground,
+          borderTopColor: theme.border,
           height: Platform.OS === 'ios' ? 88 : 60,
           paddingBottom: Platform.OS === 'ios' ? 28 : 8,
           paddingTop: 8,

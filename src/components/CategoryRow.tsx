@@ -1,5 +1,6 @@
+import { useTheme } from '@/src/hooks/useTheme';
 import { Movie } from '@/src/types';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import MovieCard from './MovieCard';
 
@@ -10,6 +11,9 @@ interface CategoryRowProps {
 }
 
 export default function CategoryRow({ title, movies, onMoviePress }: CategoryRowProps) {
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  
   if (movies.length === 0) return null;
 
   return (
@@ -31,14 +35,14 @@ export default function CategoryRow({ title, movies, onMoviePress }: CategoryRow
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     marginBottom: 24,
   },
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 16,
     paddingHorizontal: 16,
   },

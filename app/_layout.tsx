@@ -6,24 +6,25 @@ import { ActivityIndicator, View } from 'react-native';
 import 'react-native-reanimated';
 import { Provider } from 'react-redux';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { store } from '@/src/store';
 import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
 import { loadStoredAuth } from '@/src/store/slices/authSlice';
 import { loadFavorites } from '@/src/store/slices/favoritesSlice';
+import { loadThemePreference } from '@/src/store/slices/themeSlice';
 
 function RootNavigator() {
-  const colorScheme = useColorScheme();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const segments = useSegments();
   const { isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
+  const { isDarkMode } = useAppSelector((state) => state.theme);
   const [isNavigationReady, setIsNavigationReady] = useState(false);
 
   useEffect(() => {
-    // Load stored authentication on app start
+    // Load stored authentication and theme on app start
     dispatch(loadStoredAuth());
     dispatch(loadFavorites());
+    dispatch(loadThemePreference());
   }, []);
 
   useEffect(() => {
@@ -58,13 +59,13 @@ function RootNavigator() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
     </ThemeProvider>
   );
 }

@@ -1,9 +1,10 @@
 import { TMDBService } from '@/src/services/api/tmdb';
+import { useTheme } from '@/src/hooks/useTheme';
 import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
 import { addFavorite, removeFavorite } from '@/src/store/slices/favoritesSlice';
 import { Movie } from '@/src/types';
 import { Feather } from '@expo/vector-icons';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface MovieCardProps {
@@ -16,8 +17,10 @@ const CARD_WIDTH = 150;
 
 export default function MovieCard({ movie, onPress }: MovieCardProps) {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { favoriteIds } = useAppSelector((state) => state.favorites);
   const isFavorite = favoriteIds.includes(movie.id);
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const handleFavoriteToggle = (e: any) => {
     e.stopPropagation();
@@ -71,7 +74,7 @@ export default function MovieCard({ movie, onPress }: MovieCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   card: {
     width: CARD_WIDTH,
     marginBottom: 16,
@@ -81,7 +84,7 @@ const styles = StyleSheet.create({
     height: CARD_WIDTH * 1.5,
     borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: theme.border,
     position: 'relative',
     elevation: 4,
     shadowColor: '#000',
@@ -135,12 +138,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: theme.text,
     lineHeight: 17,
   },
   releaseDate: {
     fontSize: 11,
-    color: '#888',
+    color: theme.textSecondary,
     fontWeight: '500',
   },
 });

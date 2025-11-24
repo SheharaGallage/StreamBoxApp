@@ -103,6 +103,26 @@ export const StorageService = {
     }
   },
 
+  // Theme Preference
+  async setThemePreference(isDark: boolean): Promise<void> {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.THEME, isDark ? 'dark' : 'light');
+    } catch (error) {
+      console.error('Error saving theme preference:', error);
+      throw error;
+    }
+  },
+
+  async getThemePreference(): Promise<boolean> {
+    try {
+      const theme = await AsyncStorage.getItem(STORAGE_KEYS.THEME);
+      return theme === 'dark';
+    } catch (error) {
+      console.error('Error getting theme preference:', error);
+      return false;
+    }
+  },
+
   // Clear all data
   async clearAll(): Promise<void> {
     try {

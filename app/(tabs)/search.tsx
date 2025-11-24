@@ -1,11 +1,12 @@
 import { ThemedView } from '@/components/themed-view';
 import MovieCard from '@/src/components/MovieCard';
+import { useTheme } from '@/src/hooks/useTheme';
 import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
 import { clearSearchResults, searchMovies } from '@/src/store/slices/moviesSlice';
 import { Movie } from '@/src/types';
 import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     Animated,
@@ -20,10 +21,12 @@ import {
 
 export default function SearchScreen() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { searchResults, isLoading } = useAppSelector((state) => state.movies);
   const [searchQuery, setSearchQuery] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [focusAnim] = useState(new Animated.Value(0));
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const handleSearch = useCallback(async () => {
     if (searchQuery.trim().length < 2) return;
@@ -201,39 +204,39 @@ export default function SearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.background,
   },
   header: {
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 15,
-    color: '#666',
+    color: theme.textSecondary,
     fontWeight: '400',
   },
   searchContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: theme.border,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: theme.background,
     borderRadius: 16,
     paddingHorizontal: 16,
     borderWidth: 2,
@@ -250,7 +253,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 52,
     fontSize: 16,
-    color: '#1a1a1a',
+    color: theme.text,
     fontWeight: '500',
   },
   clearButton: {
@@ -260,19 +263,19 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: theme.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
   resultsHeader: {
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: '#fff',
+    backgroundColor: theme.cardBackground,
   },
   resultsCount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2196F3',
+    color: theme.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -282,7 +285,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#666',
+    color: theme.textSecondary,
     fontWeight: '500',
   },
   listContent: {
@@ -310,7 +313,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#f0f7ff',
+    backgroundColor: theme.isDarkMode ? '#1e3a5f' : '#f0f7ff',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 24,
@@ -318,13 +321,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 12,
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 15,
-    color: '#666',
+    color: theme.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 32,
@@ -336,7 +339,7 @@ const styles = StyleSheet.create({
   popularTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1a1a1a',
+    color: theme.text,
     marginBottom: 16,
   },
   popularChips: {
@@ -348,20 +351,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: theme.isDarkMode ? '#1e3a5f' : '#E3F2FD',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#BBDEFB',
+    borderColor: theme.isDarkMode ? '#3a5f8f' : '#BBDEFB',
   },
   chipText: {
     fontSize: 14,
-    color: '#1976D2',
+    color: theme.isDarkMode ? '#64b5f6' : '#1976D2',
     fontWeight: '600',
   },
   retryButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: theme.primary,
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 12,

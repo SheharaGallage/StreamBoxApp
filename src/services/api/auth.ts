@@ -17,7 +17,13 @@ export const AuthService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
       const response = await authApi.post('/auth/login', credentials);
-      return response.data;
+      const data = response.data;
+      
+      // DummyJSON returns 'accessToken' but we need 'token'
+      return {
+        ...data,
+        token: data.accessToken || data.token,
+      };
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Login failed');
     }

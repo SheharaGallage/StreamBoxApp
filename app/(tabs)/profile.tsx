@@ -1,13 +1,25 @@
-import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAppDispatch, useAppSelector } from '@/src/store/hooks';
 import { logoutUser } from '@/src/store/slices/authSlice';
+import { Feather } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 export default function ProfileScreen() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
+  const { favoriteMovies } = useAppSelector((state) => state.favorites);
+  const [darkMode, setDarkMode] = useState(false);
+  const [notifications, setNotifications] = useState(true);
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -23,25 +35,140 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const getInitials = () => {
+    if (!user?.firstName || !user?.lastName) return 'U';
+    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  };
+
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.content}>
-        <ThemedText type="title" style={styles.title}>
-          Profile
-        </ThemedText>
-
-        <View style={styles.userInfo}>
-          <ThemedText type="subtitle">
-            {user?.firstName} {user?.lastName}
-          </ThemedText>
-          <ThemedText>@{user?.username}</ThemedText>
-          <ThemedText>{user?.email}</ThemedText>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Profile</Text>
         </View>
 
+        {/* User Avatar & Info */}
+        <View style={styles.avatarSection}>
+          <View style={styles.avatarCircle}>
+            <Text style={styles.avatarText}>{getInitials()}</Text>
+          </View>
+          <Text style={styles.userName}>
+            {user?.firstName} {user?.lastName}
+          </Text>
+          <Text style={styles.userEmail}>{user?.email}</Text>
+          <Text style={styles.userUsername}>@{user?.username}</Text>
+        </View>
+
+        {/* Statistics Cards */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <View style={styles.statIconContainer}>
+              <Feather name="heart" size={24} color="#e91e63" />
+            </View>
+            <Text style={styles.statValue}>{favoriteMovies.length}</Text>
+            <Text style={styles.statLabel}>Favorites</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <View style={[styles.statIconContainer, { backgroundColor: '#e3f2fd' }]}>
+              <Feather name="film" size={24} color="#2196F3" />
+            </View>
+            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statLabel}>Watched</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <View style={[styles.statIconContainer, { backgroundColor: '#fff3e0' }]}>
+              <Feather name="star" size={24} color="#ff9800" />
+            </View>
+            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statLabel}>Reviews</Text>
+          </View>
+        </View>
+
+        {/* Settings Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Settings</Text>
+
+          <View style={styles.settingCard}>
+            <View style={styles.settingItem}>
+              <View style={styles.settingLeft}>
+                <View style={[styles.settingIcon, { backgroundColor: '#f3e5f5' }]}>
+                  <Feather name="moon" size={20} color="#9c27b0" />
+                </View>
+                <View>
+                  <Text style={styles.settingTitle}>Dark Mode</Text>
+                  <Text style={styles.settingSubtitle}>Enable dark theme</Text>
+                </View>
+              </View>
+              <Switch
+                value={darkMode}
+                onValueChange={setDarkMode}
+                trackColor={{ false: '#d0d0d0', true: '#9c27b0' }}
+                thumbColor="#fff"
+              />
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.settingItem}>
+              <View style={styles.settingLeft}>
+                <View style={[styles.settingIcon, { backgroundColor: '#e8f5e9' }]}>
+                  <Feather name="bell" size={20} color="#4caf50" />
+                </View>
+                <View>
+                  <Text style={styles.settingTitle}>Notifications</Text>
+                  <Text style={styles.settingSubtitle}>Receive updates</Text>
+                </View>
+              </View>
+              <Switch
+                value={notifications}
+                onValueChange={setNotifications}
+                trackColor={{ false: '#d0d0d0', true: '#4caf50' }}
+                thumbColor="#fff"
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* Actions Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Actions</Text>
+
+          <TouchableOpacity style={styles.actionCard}>
+            <View style={[styles.settingIcon, { backgroundColor: '#e3f2fd' }]}>
+              <Feather name="edit-3" size={20} color="#2196F3" />
+            </View>
+            <Text style={styles.actionText}>Edit Profile</Text>
+            <Feather name="chevron-right" size={20} color="#999" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionCard}>
+            <View style={[styles.settingIcon, { backgroundColor: '#fff3e0' }]}>
+              <Feather name="shield" size={20} color="#ff9800" />
+            </View>
+            <Text style={styles.actionText}>Privacy & Security</Text>
+            <Feather name="chevron-right" size={20} color="#999" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionCard}>
+            <View style={[styles.settingIcon, { backgroundColor: '#f3e5f5' }]}>
+              <Feather name="help-circle" size={20} color="#9c27b0" />
+            </View>
+            <Text style={styles.actionText}>Help & Support</Text>
+            <Feather name="chevron-right" size={20} color="#999" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Logout Button */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <ThemedText style={styles.logoutText}>Logout</ThemedText>
+          <Feather name="log-out" size={20} color="#fff" />
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-      </View>
+
+        <View style={styles.bottomPadding} />
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -49,31 +176,197 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f8f9fa',
   },
-  content: {
+  scrollView: {
     flex: 1,
-    padding: 20,
+  },
+  header: {
     paddingTop: 60,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    backgroundColor: '#fff',
   },
-  title: {
-    marginBottom: 32,
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#1a1a1a',
   },
-  userInfo: {
-    backgroundColor: '#f5f5f5',
-    padding: 20,
-    borderRadius: 12,
-    gap: 8,
-    marginBottom: 32,
+  avatarSection: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  avatarCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#2196F3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    elevation: 4,
+    shadowColor: '#2196F3',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+  },
+  avatarText: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  userName: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  userEmail: {
+    fontSize: 15,
+    color: '#666',
+    marginBottom: 2,
+  },
+  userUsername: {
+    fontSize: 14,
+    color: '#2196F3',
+    fontWeight: '600',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    gap: 12,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  statIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#fce4ec',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 13,
+    color: '#666',
+    fontWeight: '500',
+  },
+  section: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 12,
+  },
+  settingCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  settingItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  settingLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  settingIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  settingSubtitle: {
+    fontSize: 13,
+    color: '#666',
+    marginTop: 2,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 12,
+  },
+  actionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  actionText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginLeft: 12,
   },
   logoutButton: {
-    backgroundColor: '#ff4444',
-    padding: 16,
-    borderRadius: 12,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    backgroundColor: '#f44336',
+    marginHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 16,
+    elevation: 3,
+    shadowColor: '#f44336',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
   logoutText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  bottomPadding: {
+    height: 32,
   },
 });
